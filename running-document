@@ -1,0 +1,32 @@
+remove container:-
+-------------------------------
+		->sudo docker system prune -f
+
+		->sudo ps aux | grep docker
+
+		->sudo kill -9 <PID>
+
+		->docker container prune
+
+		->docker network prune
+
+
+its not working and try this
+
+	->ifconfig
+
+	->ip route show
+
+	->ip route delete 172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown
+
+	->ip route delete 172.22.0.0/16
+get latest file:-
+---------------------
+
+	ls -t | head -n 1
+
+			tvse-11-12-2024_19-06-31.tar.gz
+
+	ls -t | head -n 2 | tail -n 1
+
+			tvse-11-12-2024_16-40-38.tar.gz
