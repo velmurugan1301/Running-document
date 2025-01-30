@@ -1,3 +1,10 @@
+create user:
+sudo useradd -m techmango
+
+change user root to devopssupport:-
+----------------------------------
+sudo chown devopssupport:devopssupport <path of directory>
+
 remove container:-
 -------------------------------
 		->sudo docker system prune -f
