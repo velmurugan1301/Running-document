@@ -19,3 +19,18 @@ to check configuration file :-
 if any change to restart
 -------------------------
   ->sudo systemctl restart gitlab-runner
+
+
+stages:
+  - trigger
+
+trigger_jenkins:
+  stage: trigger
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "uattm"'
+      when: on_success
+  script:
+     curl -I -u 'Vel:Welcome@1012' "http://172.22.12.185:8080/view/UATTM/job/UATTM_UI/buildWithParameters?token=kmlfsmendSKGnkgddd&branch=uattm"
+  tags:
+    - SDP-runner
+
