@@ -12,6 +12,7 @@ sudo gitlab-runner register
 sudo systemctl enable gitlab-runner
 sudo systemctl start gitlab-runner
 sudo gitlab-runner status
+sudo gitlab-runner list
 
 to check configuration file :-
 ------------------------------------
