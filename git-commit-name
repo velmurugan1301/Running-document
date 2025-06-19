@@ -1,0 +1,36 @@
+stages:
+  - trigger
+
+trigger_jenkins:
+  stage: trigger
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "pre-prod"'
+      when: on_success
+  script:
+    - |
+      echo "Triggering Jenkins for branch: $CI_COMMIT_BRANCH"
+
+      # Get actual last non-merge commit hash
+      COMMIT_HASH=$(git rev-list --no-merges -n 1 HEAD)
+
+      # Get the commit message and author name for that commit
+      COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s' "$COMMIT_HASH")
+      AUTHOR_NAME=$(git log -1 --pretty=format:'%an' "$COMMIT_HASH")
+
+      # Encode values for URL
+      ENCODED_COMMIT_MESSAGE=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$COMMIT_MESSAGE'''))")
+      ENCODED_AUTHOR=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$AUTHOR_NAME'''))")
+      ENCODED_PROJECT=$(python3 -c "import urllib.parse, os; print(urllib.parse.quote(os.environ['CI_PROJECT_NAME']))")
+
+      echo "author=$ENCODED_AUTHOR"
+      echo "message=$ENCODED_COMMIT_MESSAGE"
+      echo "project=$ENCODED_PROJECT"
+
+      # Trigger Jenkins job
+      curl -X POST -u Vel:11aec510498ce9e4e00813a81ec76fcaf1 \
+        "http://172.22.12.185:8080/job/webhook/buildWithParameters?token=kmlfsmendSKGnkgddd&branch=$CI_COMMIT_BRANCH&message=$ENCODED_COMMIT_MESSAGE&devaloper=$ENCODED_AUTHOR&service=$ENCODED_PROJECT"
+      sleep 5
+      curl -I -u Vel:Welcome@1012 "http://172.22.12.185:8080/view/Main-service/job/mdm/buildWithParameters?token=kmlfsmendSKGnkgddd&branch=pre-prod&environment=pre"
+      
+  tags:
+    - sdp-runner
