@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+     
+    stages {
+        stage('Trigger Logic App') {
+            steps {
+                script {
+                    def branch = params.branch
+                    def message = params.message
+                    def devaloper = params.devaloper
+                    def service = params.service
+
+                    def cardJson = """
+                    {
+                        "attachments": [
+                            {
+                                "contentType": "application/vnd.microsoft.card.adaptive",
+                                "content": {
+                                    "type": "AdaptiveCard",
+                                    "version": "1.4",
+                                    "body": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "✅ Build started 🔔",
+                                            "weight": "Bolder",
+                                            "size": "Medium",
+                                            "wrap": true
+                                        },
+                                        {
+                                            "type": "FactSet",
+                                            "facts": [
+                                                {
+                                                    "title": "🛠️Service:",
+                                                    "value": "${service}"
+                                                },
+                                                {
+                                                    "title": "🌎 Branch:",
+                                                    "value": "${branch}"
+                                                },
+                                                {
+                                                    "title": "📝 Message:",
+                                                    "value": "${message}"
+                                                },
+                                                {
+                                                    "title": "👨‍💻 Initiated:",
+                                                    "value": "${devaloper}"
+                                                }
+                                                
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                    """.stripIndent().trim()
+
+                    // Send card to Logic App
+                    sh """
+                        curl -X POST "https://prod-19.centralindia.logic.azure.com:443/workflows/c4490ea189614d839bcba33c54a6555e/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=JvCh10Od18KnGrpvHE7RGt1pzFuR1hj6CmJ7C5Uq6V8" \
+                        -H "Content-Type: application/json" \
+                        -d '${cardJson.replaceAll("'", "'\\''")}'
+                    """
+                }
+            }
+        }
+    }
+}
