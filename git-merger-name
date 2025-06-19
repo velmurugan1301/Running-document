@@ -1,0 +1,26 @@
+stages:
+  - trigger
+
+trigger_jenkins:
+  stage: trigger
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "uattm"'
+      when: on_success
+  script:
+    - |
+      echo "Triggering Jenkins for branch: $CI_COMMIT_BRANCH"
+      ENCODED_COMMIT_MESSAGE=$(python3 -c "import urllib.parse, os; print(urllib.parse.quote(os.environ['CI_COMMIT_MESSAGE']))")
+      ENCODED_COMMITTER=$(python3 -c "import urllib.parse, os; print(urllib.parse.quote(os.environ['GITLAB_USER_NAME']))")
+      ENCODED_PROJECT=$(python3 -c "import urllib.parse, os; print(urllib.parse.quote(os.environ['CI_PROJECT_NAME']))")
+      AUTHOR_NAME=$(git log -1 --pretty=format:'%an')
+      ENCODED_AUTHOR=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$AUTHOR_NAME'''))")
+      echo "author=$ENCODED_AUTHOR"
+      echo "message=$ENCODED_COMMIT_MESSAGE"
+      echo "devaloper=$ENCODED_COMMITTER"
+      echo "project=$ENCODED_PROJECT"
+      curl -X POST -u Vel:11aec510498ce9e4e00813a81ec76fcaf1 "http://172.22.12.185:8080/job/webhook/buildWithParameters?token=kmlfsmendSKGnkgddd&branch=$CI_COMMIT_BRANCH&message=$ENCODED_COMMIT_MESSAGE&devaloper=$ENCODED_AUTHOR&service=$ENCODED_PROJECT"
+      sleep 5
+      curl -I -u Vel:Welcome@1012 "http://172.22.12.185:8080/view/Main-service/job/call-management/buildWithParameters?token=kmlfsmendSKGnkgddd&branch=uattm&environment=utm"
+      
+  tags:
+    - sdp-runner
